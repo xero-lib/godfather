@@ -3,26 +3,27 @@ use tokio::process::Command;
 use clap::Parser;
 
 #[derive(Parser, Debug, Clone)]
-// #[command(version, about)]
-#[command(name = "action")]
+#[command(version, about, name = "action")]
 enum CreateCli {
-    // Generate bot invite given application ID and permissions string
+    #[command(about = "Generate bot invite given application ID and permissions string")]
     Generate {
         // id of the application to invite
-        #[arg(long, short)]
+        #[arg(long, short, help = "Bot ID")]
         id: String,
         // permission value to invite the bot with
-        #[arg(long, short)]
+        #[arg(long, short, help = "Permissions string describing the invite permissions for the bot")]
         permissions: String
     },
-    #[clap(alias = "create")]
+    #[command(alias = "create", about = "Create a new project directory")]
     New {
+        #[arg(help = "Name of the project directory to create")]
         path: String,
-        #[arg(long, short, default_value = "js")]
+        #[arg(long, short, default_value = "js", help = "Which language to use for the project (js or ts)")]
         language: String,
     },
+    #[command(about = "Initialize current directory as a project")]
     Init {
-        #[arg(long, short, default_value = "js")]
+        #[arg(long, short, default_value = "js", help = "Which language to use for the project (js or ts)")]
         language: String
     },
 }
@@ -43,7 +44,7 @@ async fn main() {
                 eprintln!(r#"Directory "{path}" already exists"#);
                 std::process::exit(1);
             }
-            
+
             if let Err(e) = fs::create_dir(path.clone()) {
                 eprintln!(r#"Error creating "{path}": {e}"#);
                 std::process::exit(1);
@@ -54,7 +55,7 @@ async fn main() {
                 std::process::exit(1);
             }
 
-            let extension = 
+            let extension =
                 if matches!(language.to_ascii_lowercase().as_str(), "js" | "javascript") { "js" } else
                 if matches!(language.to_ascii_lowercase().as_str(), "ts" | "typescript") { "ts" } else
                 { unimplemented!("Unsupported language \"{language}\" ") };
